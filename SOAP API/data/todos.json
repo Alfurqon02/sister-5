@@ -58,5 +58,29 @@
     "title": "Build SOAP API",
     "description": "Create a Python SOAP service",
     "completed": false
+  },
+  {
+    "id": 18,
+    "title": "ngerjain sister",
+    "description": "yaaa",
+    "completed": false
+  },
+  {
+    "id": 19,
+    "title": "makan",
+    "description": "",
+    "completed": false
+  },
+  {
+    "id": 20,
+    "title": "Test Minum",
+    "description": "Udah Minum",
+    "completed": true
+  },
+  {
+    "id": 21,
+    "title": "Halo",
+    "description": "todo baru",
+    "completed": false
   }
 ]

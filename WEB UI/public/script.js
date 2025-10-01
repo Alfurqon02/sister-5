@@ -519,7 +519,7 @@ async function viewTextObject() {
     }
     
     try {
-        addToResults(`👀 Viewing text content of: "${objectName}" from bucket: "${bucketName}"`);
+        addToResults(`Viewing text content of: "${objectName}" from bucket: "${bucketName}"`);
         const result = await apiCall(`/api/minio/buckets/${bucketName}/objects/${objectName}/text`);
         
         if (result.success) {
@@ -570,13 +570,182 @@ async function deleteObject() {
     }
 }
 
+//ANCHOR Socket Communication Functions
+async function testSocketConnection() {
+    setStatus('socketStatus', 'loading');
+    try {
+        addToResults('Testing Socket server connection...');
+        const result = await apiCall('/api/socket/test');
+        
+        if (result.success) {
+            setStatus('socketStatus', 'online', 'Connected');
+            addToResults('Socket server is online');
+            addToResults(`  Server: ${result.server_info}`);
+            addToResults(`  Response: ${result.response}`);
+        } else {
+            setStatus('socketStatus', 'offline', 'Disconnected');
+            addToResults('Socket server test failed');
+            addToResults(`  Error: ${result.error}`);
+        }
+    } catch (error) {
+        setStatus('socketStatus', 'offline', 'Error');
+        addToResults('Socket connection test error: ' + error.message);
+    }
+}
+
+async function sendSocketMessage() {
+    const messageInput = document.getElementById('socketMessage');
+    const message = messageInput.value.trim();
+    
+    if (!message) {
+        addToResults('Please enter a message to send');
+        return;
+    }
+    
+    try {
+        addToResults(`Sending socket message: "${message}"`);
+        const result = await apiCall('/api/socket/send', {
+            method: 'POST',
+            body: JSON.stringify({ message: message })
+        });
+        
+        if (result.success) {
+            addToResults('Message sent successfully');
+            addToResults(`  Sent: ${result.sent_message}`);
+            addToResults(`  Server Response: ${result.server_response}`);
+            
+            // Update message history
+            updateSocketHistory();
+            
+            // Clear input
+            messageInput.value = '';
+        } else {
+            addToResults('Failed to send message');
+            addToResults(`  Error: ${result.error}`);
+        }
+    } catch (error) {
+        addToResults('Error sending socket message: ' + error.message);
+    }
+}
+
+async function testEcho() {
+    const echoInput = document.getElementById('echoText');
+    const text = echoInput.value.trim();
+    
+    if (!text) {
+        addToResults('Please enter text to echo');
+        return;
+    }
+    
+    try {
+        addToResults(`Testing echo with: "${text}"`);
+        const result = await apiCall('/api/socket/echo', {
+            method: 'POST',
+            body: JSON.stringify({ text: text })
+        });
+        
+        if (result.success) {
+            addToResults('Echo test successful');
+            addToResults(`  Original: ${result.original_text}`);
+            addToResults(`  Echo Command: ${result.echo_command}`);
+            addToResults(`  Server Response: ${result.server_response}`);
+            
+            // Clear input
+            echoInput.value = '';
+        } else {
+            addToResults('Echo test failed');
+            addToResults(`  Error: ${result.error}`);
+        }
+    } catch (error) {
+        addToResults('Error testing echo: ' + error.message);
+    }
+}
+
+async function getMessageHistory() {
+    try {
+        addToResults('Fetching socket message history...');
+        const result = await apiCall('/api/socket/messages');
+        
+        if (result.success) {
+            addToResults(`Retrieved ${result.message_count} messages`);
+            addToResults(`  Server: ${result.server_info}`);
+            
+            updateSocketHistory(result.messages);
+        } else {
+            addToResults('Failed to get message history');
+            addToResults(`  Error: ${result.error}`);
+        }
+    } catch (error) {
+        addToResults('Error fetching message history: ' + error.message);
+    }
+}
+
+async function clearMessageHistory() {
+    if (!confirm('Are you sure you want to clear the message history?')) {
+        return;
+    }
+    
+    try {
+        addToResults('Clearing socket message history...');
+        const result = await apiCall('/api/socket/messages', {
+            method: 'DELETE'
+        });
+        
+        if (result.success) {
+            addToResults('Message history cleared');
+            addToResults(`  ${result.message}`);
+            
+            // Clear the display
+            updateSocketHistory([]);
+        } else {
+            addToResults('Failed to clear message history');
+            addToResults(`  Error: ${result.error}`);
+        }
+    } catch (error) {
+        addToResults('Error clearing message history: ' + error.message);
+    }
+}
+
+function updateSocketHistory(messages) {
+    const historyDiv = document.getElementById('socketHistory');
+    
+    if (!messages || messages.length === 0) {
+        historyDiv.innerHTML = '<p class="text-muted mb-0">No messages yet. Send a message to see the history.</p>';
+        return;
+    }
+    
+    let historyHTML = '';
+    messages.forEach((msg, index) => {
+        const timestamp = new Date(msg.timestamp).toLocaleString();
+        historyHTML += `
+            <div class="message-entry mb-2 p-2 border rounded">
+                <div class="d-flex justify-content-between">
+                    <strong>Message #${msg.id}</strong>
+                    <small class="text-muted">${timestamp}</small>
+                </div>
+                <div class="mt-1">
+                    <strong>Sent:</strong> <code>${msg.message}</code>
+                </div>
+                <div>
+                    <strong>Response:</strong> <code>${msg.response}</code>
+                </div>
+                <small class="text-muted">From: ${msg.client_info}</small>
+            </div>
+        `;
+    });
+    
+    historyDiv.innerHTML = historyHTML;
+}
+
 //ANCHOR Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    addToResults('🚀 SOAP & MinIO API Tester initialized');
-    addToResults('👋 Welcome! Test your services by clicking the connection buttons above.');
+    addToResults('SOAP, MinIO & Socket API Tester initialized');
+    addToResults('Welcome! Test your services by clicking the connection buttons above.');
+    addToResults('Socket communication demo ready for distributed systems testing!');
     addToResults('');
     
     // Test connections on load
     testSoapConnection();
     testMinioConnection();
+    testSocketConnection();
 });

@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 //ANCHOR Import routes
 const soapRoutes = require('./routes/soap');
 const minioRoutes = require('./routes/minio');
+const socketRoutes = require('./routes/socket');
 
 const app = express();
 const PORT = process.env.WEB_UI_PORT || 3000;
@@ -22,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //ANCHOR API Routes
 app.use('/api/soap', soapRoutes);
 app.use('/api/minio', minioRoutes);
+app.use('/api/socket', socketRoutes);
 
 //ANCHOR Serve main page
 app.get('/', (req, res) => {
@@ -33,4 +35,5 @@ app.listen(PORT, () => {
     console.log('Make sure the following services are running:');
     console.log(`- SOAP API server on ${process.env.SOAP_URL || 'http://localhost:8000'}`);
     console.log(`- MinIO server on http://${process.env.MINIO_ENDPOINT || 'localhost'}:${process.env.MINIO_PORT || 9000}`);
+    console.log(`- Socket server on ${process.env.SOCKET_HOST || 'localhost'}:${process.env.SOCKET_PORT || 8080}`);
 });
