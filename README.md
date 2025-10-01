@@ -1,8 +1,8 @@
-# SOAP & MinIO API Web UI
+# SOAP, MinIO & Socket API Web UI
 
-**Distributed Systems Course Week 4**
+**Distributed Systems Course Project**
 
-A comprehensive web interface for testing SOAP API and MinIO storage functionality with full CRUD operations. This repository demonstrates distributed system concepts including web services, object storage, and inter-service communication patterns.
+A comprehensive web interface for testing SOAP API, MinIO storage, and Socket communication functionality with full CRUD operations. This project demonstrates distributed system concepts including web services, object storage, and real-time socket communication patterns.
 
 ## Features
 
@@ -22,6 +22,22 @@ A comprehensive web interface for testing SOAP API and MinIO storage functionali
 - **Delete Objects**: Remove files from storage
 - Connection status monitoring
 
+### Socket Communication Testing
+- **Real-time Messaging**: Send messages to TCP socket server
+- **Echo Testing**: Test message echo functionality
+- **Command Support**: Special commands (ping, time, status, echo, help)
+- **Message History**: View all socket communication history
+- **Connection Monitoring**: Real-time socket server status
+- **Multi-client Support**: Multiple users can connect simultaneously
+
+### Socket Server Commands
+- `ping` → Returns "pong"
+- `time` → Returns current server time
+- `status` → Returns connection information
+- `echo <message>` → Returns the message
+- `help` → Shows available commands
+- Any other message → Returns "this is reply from server"
+
 ## Prerequisites
 
 Before running the web UI, ensure the following services are running:
@@ -36,6 +52,11 @@ Before running the web UI, ensure the following services are running:
    - Run: `docker-compose up -d`
    - Should be accessible at `http://localhost:9000`
    - Console at `http://localhost:9001`
+
+3. **Socket Server** (Port 8080)
+   - Navigate to `SOCKET COMMON` directory
+   - Run: `python main.py`
+   - Should be accessible at `localhost:8080`
 
 ## Installation & Setup
 
@@ -142,6 +163,13 @@ Before running the web UI, ensure the following services are running:
 - `GET /api/minio/buckets/:bucket/objects/:object/text` - Get text content
 - `DELETE /api/minio/buckets/:bucket/objects/:object` - Delete object
 
+### Socket API Routes
+- `POST /api/socket/test` - Test socket connection
+- `POST /api/socket/send` - Send message to socket server
+- `POST /api/socket/echo` - Echo test functionality
+- `GET /api/socket/messages` - Get message history
+- `DELETE /api/socket/messages` - Clear message history
+
 ## Troubleshooting
 
 ### Common Issues
@@ -156,12 +184,17 @@ Before running the web UI, ensure the following services are running:
    - Check if MinIO container is up: `docker ps`
    - Verify MinIO is accessible at `http://localhost:9000`
 
-3. **Web UI Not Loading**
+3. **Socket Server Connection Failed**
+   - Ensure the socket server is running on port 8080
+   - Check if `main.py` in SOCKET COMMON directory is running
+   - Verify no firewall is blocking the connection
+
+4. **Web UI Not Loading**
    - Check if Node.js dependencies are installed: `npm install`
    - Verify the web server is running on port 3000
    - Check for any console errors in browser developer tools
 
-4. **File Upload Issues**
+5. **File Upload Issues**
    - Ensure the bucket exists before uploading
    - Check file size limits
    - Verify MinIO has sufficient storage space
@@ -176,21 +209,8 @@ Before running the web UI, ensure the following services are running:
 - **Backend**: Node.js, Express.js
 - **SOAP Client**: Axios (for HTTP requests to SOAP service)
 - **MinIO Client**: Official MinIO JavaScript SDK
+- **Socket Communication**: Native TCP sockets with Python
 - **File Upload**: Multer middleware
-
-## File Structure
-```
-WEB UI/
-├── package.json          # Dependencies and scripts
-├── server.js            # Main server file
-├── routes/
-│   ├── soap.js          # SOAP API routes
-│   └── minio.js         # MinIO API routes
-└── public/
-    ├── index.html       # Main web interface
-    ├── style.css        # Styling
-    └── script.js        # Client-side JavaScript
-```
 
 ## Development
 
